@@ -3,10 +3,9 @@
 namespace OdooRPCClient;
 
 use Ripcord\Ripcord;
-use \ArrayAccess;
 use \Exception;
 
-class Client implements ArrayAccess 
+class Client
 {
 	/**
      * Host to connect to
@@ -59,15 +58,16 @@ class Client implements ArrayAccess
 	 * @param string     $password   Password of the user
 	 */
 	protected $models;
+	/*
+	 * Odoo Environnment
+	 */
+	public $env;
 
-	public function __construct($host, $database, $login, $password)
+
+	public function __construct($host)
 	{
-		$this->host = $host . "/xmlrpc/2";
-		$this->database = $database;
-		$this->login = $login;
-        $this->password = $password;
+		$this->host = $host . "/xmlrpc/2";		
 		$this->models = [];
-		$this->uid();
 	}
 	/**
 	 * Get version
@@ -87,34 +87,20 @@ class Client implements ArrayAccess
 	 */
     public function login($database, $login, $password)
     {
+		$this->database = $database;
+		$this->login = $login;
+		$this->password = $password;
+		if(!$this->userId)
+		{
+			$this->uid();
+		}
 
+		if(!$this->env) {
+			$this->env = new Environment($this->getClient('object'), $database, $this->userId, $password);
+		}
     }
 
-    public function offsetSet($offset, $value) {
-        if (is_null($offset)) {
-            $this->models[] = $value;
-        } else {
-            $this->models[$offset] = $value;
-        }
-    }
-
-    public function offsetExists($offset) {
-        return isset($this->models[$offset]);
-    }
-
-    public function offsetUnset($offset) {
-        unset($this->models[$offset]);
-    }
-
-    public function offsetGet($offset) {
-        if(!isset($this->container[$offset])) 
-        {
-            $this->container[$offset] = new Resource($this->getClient('object'), $offset, $this->database, $this->userId, $this->password);
-        }
-        return $this->container[$offset];
-
-    }
-
+    
     /**
 	 * Get XmlRpc Client
 	 *
@@ -138,6 +124,7 @@ class Client implements ArrayAccess
 		$this->client = Ripcord::client($this->host . '/' . $path);
         return $this->client;
 	}
+
     /**
 	 * Get uid
 	 *

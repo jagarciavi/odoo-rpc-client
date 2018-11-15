@@ -16,8 +16,11 @@ class ConnectionTest extends TestCase
             'password' => 'admin'
         ];
 
-        $client = new Client($data['host'], $data['database'], $data['login'], $data['password']);
-        $version = $client->version();
+        $odoo = new Client($data['host']);
+
+        $odoo->login($data['database'], $data['login'], $data['password']);
+        $version = $odoo->version();
         $this->assertArrayHasKey('protocol_version',$version);
+        $this->assertTrue(is_string($odoo->env->user->name));
     }
 }
