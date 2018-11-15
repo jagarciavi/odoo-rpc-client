@@ -11,7 +11,7 @@ class ResourcesTest extends TestCase
     {
         $data = [
             'host' => 'http://localhost',
-            'database' => 'demo_enterprise',
+            'database' => 'odoo',
             'login' => 'admin',
             'password' => 'admin'
         ];
