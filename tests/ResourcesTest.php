@@ -11,9 +11,9 @@ class ResourcesTest extends TestCase
     {
         $data = [
             'host' => 'http://localhost',
-            'database' => 'demo_enterprise',
+            'database' => 'odoo',
             'login' => 'admin',
-            'password' => 'HbuuylZu9fuT'
+            'password' => 'admin'
         ];
 
         $odoo = new Client($data['host']);
