@@ -73,7 +73,7 @@ class Resource
             [$criteria],
             ['offset'=>$offset, 'limit'=>$limit, 'order' => $order]
         );
-		return $response;
+		return $this->browse($response);
 	}
 	/**
 	 * Search_count models
@@ -115,7 +115,7 @@ class Resource
             [$ids],
             ['fields'=>$fields]
         );
-		return $response;
+		return new Recordset($this, $response);
 	}
 	/**
 	 * Search and Read model(s)
@@ -183,7 +183,7 @@ class Resource
                 $fields
             ]
         );
-		return $response;
+		return new Recordset($this, $response);
 	}
 	/**
 	 * Unlink model(s)
