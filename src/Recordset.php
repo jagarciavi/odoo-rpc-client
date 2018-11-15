@@ -73,12 +73,19 @@ class RecordSet implements IteratorAggregate, Countable
         }
     }
 
-	public function search($criteria, $offset = 0, $limit = 100, $order = '')
+    public function __call($method, $args)
+    {
+        array_unshift($args, $this->ids);
+        return call_user_func_array([$this->__resource, $method], $args);
+    }
+
+
+	public function search($criteria = [], $offset = 0, $limit = 100, $order = '')
     {
         return $this->__resource->search($criteria, $offset, $limit, $order);
     }
 
-	public function search_count($criteria)
+	public function search_count($criteria = [])
     {
         return $this->__resource->search_count($criteria);
     }
@@ -88,7 +95,7 @@ class RecordSet implements IteratorAggregate, Countable
         return $this->__resource->browse($ids, $fields);
     }
 
-	public function search_read($criteria, $fields = array(), $limit=100, $order = '')
+	public function search_read($criteria = [], $fields = array(), $limit=100, $order = '')
     {
         return $this->__resource->search_read($criteria);
     }

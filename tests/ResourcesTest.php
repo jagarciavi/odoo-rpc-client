@@ -7,45 +7,38 @@ use PHPUnit\Framework\TestCase;
 
 class ResourcesTest extends TestCase
 {
-    public function test_it_counts_admin_users(): void
-    {   
+    public function getClient() 
+    {
         $data = [
             'host' => 'http://localhost',
-            'database' => 'demo',
+            'database' => 'odoo',
             'login' => 'admin',
             'password' => 'admin'
         ];
 
-        $odoo = new Client($data['host'], $data['database'], $data['login'], $data['password']);
+        return new Client($data['host'], $data['database'], $data['login'], $data['password']);
+    }
 
-        $count = $odoo['res.users']->search_count([['login','=', $data['login'] ]]);
+    public function test_it_counts_admin_users(): void
+    {   
+        $odoo = $this->getClient();
+
+        $count = $odoo['res.users']->search_count([['login','=', 'admin' ]]);
         $this->assertEquals($count, 1);
     }
 
     public function test_it_fetchs_all_users(): void
     {
-        $data = [
-            'host' => 'http://localhost',
-            'database' => 'demo',
-            'login' => 'admin',
-            'password' => 'admin'
-        ];
+        $odoo = $this->getClient();
 
-        $odoo = new Client($data['host'], $data['database'], $data['login'], $data['password']);
         $users = $odoo['res.users']->search([['active','=',True]]);
         $this->assertGreaterThan(0, count($users));
     }
 
-    public function test_it_create_edit_delete_partner(): void
+    public function test_it_create_delete_partner(): void
     {
-        $data = [
-            'host' => 'http://localhost',
-            'database' => 'demo',
-            'login' => 'admin',
-            'password' => 'admin'
-        ];
+        $odoo = $this->getClient();
 
-        $odoo = new Client($data['host'], $data['database'], $data['login'], $data['password']);
         $vals = [
             'firstname' => 'Pippo',
             'lastname' => 'Pluto',
@@ -77,5 +70,31 @@ class ResourcesTest extends TestCase
         ]);
 
         $this->assertEquals(0, $count);
+
+        $partners = $odoo['res.partner']->search([
+            ['firstname', '=', $vals['firstname']],
+            ['lastname', '=', $vals['lastname']],
+            ['email', '=', $vals['email']]
+        ]);
+
+        $this->assertEquals(0, count($partners));
+    }
+
+    public function test_it_browse_not_existent_resource(): void
+    {
+        $odoo = $this->getClient();
+
+        $partner = $odoo['res.partner']->browse(99999999999999999);
+
+        $this->assertEquals(0, count($partner));
+    }
+
+    public function test_it_calls_custom_method_on_res_country(): void
+    {
+        $odoo = $this->getClient();
+        $country_ids = $odoo['res.country']->search();
+        $country = $odoo['res.country']->browse($country_ids[0]);
+        $fields = $country->get_address_fields();
+        $this->assertContains('street', $fields);
     }
 }
