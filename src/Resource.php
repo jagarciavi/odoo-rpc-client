@@ -50,7 +50,24 @@ class Resource
 		$this->database = $database;
 		$this->userId = $userId;
 		$this->password = $password;
-    }
+	}
+	
+    public function __call($method, $args)
+	{	
+		if(count($args) < 1) 
+		{
+			throw new Exception("Invalid number of arguments for custom method");
+		}
+		
+		return  $this->client->execute_kw(
+            $this->database,
+            $this->userId,
+            $this->password,
+            $this->model,
+            $method,
+            $args
+        );
+	}
     
     /**
 	 * Search models
@@ -62,7 +79,7 @@ class Resource
 	 *
 	 * @return array Array of model id's
 	 */
-	public function search($criteria, $offset = 0, $limit = 100, $order = '')
+	public function search($criteria = [], $offset = 0, $limit = 100, $order = '')
 	{
 		$response = $this->client->execute_kw(
             $this->database,
@@ -83,7 +100,7 @@ class Resource
 	 *
 	 * @return array Array of model id's
 	 */
-	public function search_count($criteria)
+	public function search_count($criteria = [])
 	{
 		$response = $this->client->execute_kw(
             $this->database,
@@ -115,7 +132,7 @@ class Resource
             [$ids],
             ['fields'=>$fields]
         );
-		return $response;
+		return new Recordset($this, $response);
 	}
 	/**
 	 * Search and Read model(s)
@@ -127,7 +144,7 @@ class Resource
 	 *
 	 * @return array An array of models
 	 */
-	public function search_read($criteria, $fields = array(), $limit=100, $order = '')
+	public function search_read($criteria = [], $fields = array(), $limit=100, $order = '')
 	{
         $response = $this->client->execute_kw(
             $this->database,
@@ -183,7 +200,7 @@ class Resource
                 $fields
             ]
         );
-		return $response;
+		return new Recordset($this, $response);
 	}
 	/**
 	 * Unlink model(s)

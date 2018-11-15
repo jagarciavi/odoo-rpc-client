@@ -4,6 +4,7 @@ namespace OdooRPCClient;
 
 use Ripcord\Ripcord;
 use \ArrayAccess;
+use \Exception;
 
 class Client implements ArrayAccess 
 {
@@ -18,13 +19,13 @@ class Client implements ArrayAccess
 	 *
 	 * @var integer
 	 */
-	protected $uid;
+	protected $userId;
 	/**
 	 * Current users username
 	 *
 	 * @var string
 	 */
-	protected $user;
+	protected $login;
 	/**
 	 * Current database
 	 *
@@ -59,13 +60,14 @@ class Client implements ArrayAccess
 	 */
 	protected $models;
 
-	public function __construct($host, $database, $user, $password)
+	public function __construct($host, $database, $login, $password)
 	{
 		$this->host = $host . "/xmlrpc/2";
 		$this->database = $database;
-		$this->user = $user;
+		$this->login = $login;
         $this->password = $password;
-        $this->models = [];
+		$this->models = [];
+		$this->uid();
 	}
 	/**
 	 * Get version
@@ -107,7 +109,7 @@ class Client implements ArrayAccess
     public function offsetGet($offset) {
         if(!isset($this->container[$offset])) 
         {
-            $this->container[$offset] = new Resource($this->getClient('object'), $offset, $this->database, $this->uid(), $this->password);
+            $this->container[$offset] = new Resource($this->getClient('object'), $offset, $this->database, $this->userId, $this->password);
         }
         return $this->container[$offset];
 
@@ -143,15 +145,20 @@ class Client implements ArrayAccess
 	 */
 	protected function uid()
 	{
-		if ($this->uid === null) {
+		if ($this->userId === null) {
 			$client = $this->getClient('common');
-			$this->uid = $client->authenticate(
+			$this->userId = $client->authenticate(
 				$this->database,
-				$this->user,
+				$this->login,
 				$this->password,
                 array()
 			);
-        }
-		return $this->uid;
+		}
+
+		if(!$this->userId) {
+			throw new Exception("Odoo Connection failed");
+		}
+
+		return $this->userId;
 	}
 }
