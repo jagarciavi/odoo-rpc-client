@@ -11,19 +11,21 @@ class ResourcesTest extends TestCase
     {
         $data = [
             'host' => 'http://localhost',
-            'database' => 'odoo',
+            'database' => 'demo_enterprise',
             'login' => 'admin',
-            'password' => 'admin'
+            'password' => 'HbuuylZu9fuT'
         ];
 
-        return new Client($data['host'], $data['database'], $data['login'], $data['password']);
+        $odoo = new Client($data['host']);
+        $odoo->login($data['database'], $data['login'], $data['password']);
+        return $odoo;
     }
 
     public function test_it_counts_admin_users(): void
     {   
         $odoo = $this->getClient();
 
-        $count = $odoo['res.users']->search_count([['login','=', 'admin' ]]);
+        $count = $odoo->env['res.users']->search_count([['login','=', 'admin' ]]);
         $this->assertEquals($count, 1);
     }
 
@@ -31,7 +33,7 @@ class ResourcesTest extends TestCase
     {
         $odoo = $this->getClient();
 
-        $users = $odoo['res.users']->search([['active','=',True]]);
+        $users = $odoo->env['res.users']->search([['active','=',True]]);
         $this->assertGreaterThan(0, count($users));
     }
 
@@ -45,15 +47,15 @@ class ResourcesTest extends TestCase
             'email' => 'mario.rossi.123456@rossi.it'
         ];
 
-        $partner_id = $odoo['res.partner']->create($vals);
+        $partner_id = $odoo->env['res.partner']->create($vals);
 
         $this->assertTrue(is_integer($partner_id));
 
-        $partner = $odoo['res.partner']->browse($partner_id);
+        $partner = $odoo->env['res.partner']->browse($partner_id);
 
         $this->assertTrue(is_string($partner->name));
 
-        $count = $odoo['res.partner']->search_count([
+        $count = $odoo->env['res.partner']->search_count([
             ['firstname', '=', $vals['firstname']],
             ['lastname', '=', $vals['lastname']],
             ['email', '=', $vals['email']]
@@ -63,7 +65,7 @@ class ResourcesTest extends TestCase
 
         $partner->unlink();
 
-        $count = $odoo['res.partner']->search_count([
+        $count = $odoo->env['res.partner']->search_count([
             ['firstname', '=', $vals['firstname']],
             ['lastname', '=', $vals['lastname']],
             ['email', '=', $vals['email']]
@@ -71,7 +73,7 @@ class ResourcesTest extends TestCase
 
         $this->assertEquals(0, $count);
 
-        $partners = $odoo['res.partner']->search([
+        $partners = $odoo->env['res.partner']->search([
             ['firstname', '=', $vals['firstname']],
             ['lastname', '=', $vals['lastname']],
             ['email', '=', $vals['email']]
@@ -84,7 +86,7 @@ class ResourcesTest extends TestCase
     {
         $odoo = $this->getClient();
 
-        $partner = $odoo['res.partner']->browse(99999999999999999);
+        $partner = $odoo->env['res.partner']->browse(99999999999999999);
 
         $this->assertEquals(0, count($partner));
     }
@@ -92,8 +94,8 @@ class ResourcesTest extends TestCase
     public function test_it_calls_custom_method_on_res_country(): void
     {
         $odoo = $this->getClient();
-        $country_ids = $odoo['res.country']->search();
-        $country = $odoo['res.country']->browse($country_ids[0]);
+        $country_ids = $odoo->env['res.country']->search();
+        $country = $odoo->env['res.country']->browse($country_ids[0]);
         $fields = $country->get_address_fields();
         $this->assertContains('street', $fields);
     }
