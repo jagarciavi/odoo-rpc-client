@@ -1,6 +1,6 @@
 # Odoo RPC Client for PHP
 
-Odoo RPC Clinet is a PHP library providing an easy way to interact with your Odoo models. Is is inspired by the great [OdooRPC](https://github.com/OCA/odoorpc) Python library.
+Odoo RPC Client is a PHP library providing an easy way to interact with your Odoo models. Is is inspired by the great [OdooRPC](https://github.com/OCA/odoorpc) Python library.
 
 It supports access to all data models methods including custom api methods with an API similar to the server-side API.
 
@@ -41,7 +41,7 @@ It is planned to support:
 
 # Supported Odoo server versions
 
-OdooRPC is tested on all major releases of Odoo (starting from 8.0).
+OdooRPCClient is tested on all major releases of Odoo (starting from 8.0).
 
 # Bug Tracker
 
