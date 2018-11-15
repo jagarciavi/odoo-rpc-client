@@ -4,24 +4,51 @@ namespace OdooRPCClient;
 
 class Record 
 {
+    /**
+     * Current Odoo Resource
+	 *
+	 * @var Resource
+	 */
     private $__resource;
+
+    /**
+     * Current record data
+	 *
+	 * @var Array
+	 */
     private $__data;
 
+    /**
+	 * Record constructor
+	 *
+	 * @param string     $resoource       The resource related to this record
+	 * @param string     $data   The record data
+	 */
     public function __construct($resource, $data)
     {
         $this->__resource = $resource;
         
         $this->__data = $data;
     }
-
+    
+    /**
+	 * Magic setter
+	 *
+	 * @param string     $name    Name of the attribute
+	 * @param string     $value   New value to assign
+	 */
     public function __set($name, $value)
     {
         $this->__data[$name] = $value;
     }
-
+    
+    /**
+	 * Magic getter
+	 *
+	 * @param string     $name    Name of the attribute
+	 */
     public function __get($name)
     {
-
         if(array_key_exists($name, $this->__data)) {
             return $this->__data[$name];
         }
@@ -29,46 +56,53 @@ class Record
         return null;
     }
 
+    /**
+	 * Magic Caller
+	 *
+     * Call custom odoo method on this record
+     *  
+	 * @param string     $method    Name of the remote method
+	 * @param string     $args   List of arguments
+	 */
+    public function __call($method, $args)
+    {
+        array_unshift($args, [$this->id]);
+        return call_user_func_array([$this->__resource, $method], $args);
+    }
+
+    /**
+	 * Magic Check attribute
+	 *
+	 * @param string     $name    Name of the attribute
+	 */
     public function __isset($name)
     {
         return isset($this->__data[$name]);
     }
-
+    
+    /**
+	 * Magic Delete attribute
+	 *
+	 * @param string     $name    Name of the attribute
+	 */
     public function __unset($name)
     {
         unset($this->__data[$name]);
     }
 
-    public function search($criteria, $offset = 0, $limit = 100, $order = '')
+    /**
+	 * Write record remotely
+	 *
+	 */
+    public function write()
     {
-        return $this->__resource->search($criteria, $offset, $limit, $order);
+        return $this->__resource->create($this->id, $this->__data);
     }
-
-	public function search_count($criteria)
-    {
-        return $this->__resource->search_count($criteria);
-    }
-
-	public function browse($ids, $fields = array())
-    {
-        return $this->__resource->browse($ids, $fields);
-    }
-
-	public function search_read($criteria, $fields = array(), $limit=100, $order = '')
-    {
-        return $this->__resource->search_read($criteria);
-    }
-
-    public function create($data)
-    {
-        return $this->__resource->create($data);
-    }
-
-	public function write($data)
-    {
-        return $this->__resource->create($this->id, $data);
-    }
-
+    
+    /**
+	 * Delete record remotely
+	 *
+	 */
     public function unlink()
 	{
         return $this->__resource->unlink($this->id);

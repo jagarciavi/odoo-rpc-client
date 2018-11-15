@@ -10,8 +10,8 @@ class ConnectionTest extends TestCase
     public function test_it_connects_to_odoo_and_does_login(): void
     {   
         $data = [
-            'host' => 'https://demo3.odoo.com',
-            'database' => 'demo',
+            'host' => 'http://localhost',
+            'database' => 'odoo',
             'login' => 'admin',
             'password' => 'admin'
         ];
