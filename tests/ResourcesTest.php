@@ -26,6 +26,7 @@ class ResourcesTest extends TestCase
         $odoo = $this->getClient();
 
         $count = $odoo->env['res.users']->search_count([['login','=', 'admin' ]]);
+        print_r($count);
         $this->assertEquals($count, 1);
     }
 
@@ -98,5 +99,14 @@ class ResourcesTest extends TestCase
         $country = $odoo->env['res.country']->browse($country_ids[0]);
         $fields = $country->get_address_fields();
         $this->assertContains('street', $fields);
+    }
+
+    public function test_it_access_nested_model(): void
+    {
+        $odoo = $this->getClient();
+        $ids = $odoo->env['res.partner']->search();
+        $partner = $odoo->env['res.partner']->browse($ids[0]);
+
+        $this->assertTrue(is_string($partner->company_id->name));
     }
 }

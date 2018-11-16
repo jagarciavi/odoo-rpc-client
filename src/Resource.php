@@ -34,6 +34,8 @@ class Resource
 	 * @var Client
 	 */
 	protected $client;
+
+	public $fields;
     
     /**
 	 * Odoo constructor
@@ -43,13 +45,25 @@ class Resource
 	 * @param string     $user       The username
 	 * @param string     $password   Password of the user
 	 */
-    public function __construct($client, $model, $database, $userId, $password)
+    public function __construct($env, $model, $database, $userId, $password)
 	{
-        $this->client = $client;
+        $this->env = $env;
         $this->model = $model;
 		$this->database = $database;
 		$this->userId = $userId;
 		$this->password = $password;
+		$this->loadFields();
+	}
+
+	private function loadFields()
+	{
+		$fields = $this->fields_get([]);
+		$this->fields = [];
+
+		foreach($fields as $fieldName => $data)
+		{
+			$this->fields[$fieldName] = new Field($data);
+		}
 	}
 	
     public function __call($method, $args)
@@ -58,8 +72,7 @@ class Resource
 		{
 			throw new Exception("Invalid number of arguments for custom method");
 		}
-		
-		return  $this->client->execute_kw(
+		return  $this->env->client->execute_kw(
             $this->database,
             $this->userId,
             $this->password,
@@ -68,6 +81,8 @@ class Resource
             $args
         );
 	}
+
+	
     
     /**
 	 * Search models
@@ -81,7 +96,7 @@ class Resource
 	 */
 	public function search($criteria = [], $offset = 0, $limit = 100, $order = '')
 	{
-		$response = $this->client->execute_kw(
+		$response = $this->env->client->execute_kw(
             $this->database,
             $this->userId,
             $this->password,
@@ -102,10 +117,7 @@ class Resource
 	 */
 	public function search_count($criteria = [])
 	{
-		$response = $this->client->execute_kw(
-            $this->database,
-            $this->userId,
-            $this->password,
+		$response = $this->env->execute(
             $this->model,
             'search_count',
             [$criteria]
@@ -123,7 +135,7 @@ class Resource
 	 */
 	public function browse($ids, $fields = array())
 	{
-        $response = $this->client->execute_kw(
+        $response = $this->env->client->execute_kw(
             $this->database,
             $this->userId,
             $this->password,
@@ -146,7 +158,7 @@ class Resource
 	 */
 	public function search_read($criteria = [], $fields = array(), $limit=100, $order = '')
 	{
-        $response = $this->client->execute_kw(
+        $response = $this->env->client->execute_kw(
             $this->database,
             $this->userId,
             $this->password,
@@ -167,7 +179,7 @@ class Resource
    	 */
    	public function create($data)
    	{
-        $response = $this->client->execute_kw(
+        $response = $this->env->client->execute_kw(
             $this->database,
             $this->userId,
             $this->password,
@@ -189,7 +201,7 @@ class Resource
 	 */
 	public function write($ids, $fields)
 	{
-        $response = $this->client->execute_kw(
+        $response = $this->env->client->execute_kw(
             $this->database,
             $this->userId,
             $this->password,
@@ -212,7 +224,7 @@ class Resource
 	 */
 	public function unlink($ids)
 	{
-        $response = $this->client->execute_kw(
+        $response = $this->env->client->execute_kw(
             $this->database,
             $this->userId,
             $this->password,

@@ -10,6 +10,8 @@ class RecordSet implements IteratorAggregate, Countable
     private $__resource;
     private $__isSingletone;
     private $__data;
+    public $id;
+    public $ids;
 
     public function __construct($resource, $data)
     {
@@ -28,6 +30,7 @@ class RecordSet implements IteratorAggregate, Countable
         {
             $this->id = $this->ids[0];
         }
+
     }
 
     public function count() {
