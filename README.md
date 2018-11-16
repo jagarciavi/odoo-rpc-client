@@ -22,6 +22,7 @@ $partner_ids = $odoo->env['res.partner']->browse($ids);
 foreach($partner_ids as $partner)
 {
     echo $partner->name . "\n";
+    echo $partner->company_id->name . "\n";
 }
 
 
@@ -35,7 +36,6 @@ Is coming soon...
 
 It is planned to support:
 
-- Auto load nested resources (ie. $partner->company_id->name)
 - Odoo databases administration
 - Supporting Internationalization
 

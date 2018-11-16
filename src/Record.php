@@ -50,7 +50,15 @@ class Record
     public function __get($name)
     {
         if(array_key_exists($name, $this->__data)) {
-            return $this->__data[$name];
+            if($this->__resource->fields[$name]->isRelation())
+            {
+                $model = $this->__resource->fields[$name]->model();
+                return $this->__resource->env[$model]->browse($this->__data[$name][0]);
+            }
+            else 
+            {
+                return $this->__data[$name];
+            }
         }
         
         return null;
