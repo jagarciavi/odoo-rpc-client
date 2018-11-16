@@ -36,8 +36,8 @@ Is coming soon...
 
 It is planned to support:
 
-- Odoo databases administration
 - Supporting Internationalization
+- Odoo databases administration
 
 # Supported Odoo server versions
 
