@@ -1,7 +1,7 @@
 {
     "name": "metadonors/odoo-rpc-client",
     "type": "library",
-    "description": "A PHP Client for Odoo using Ripcord RPC library (as used in Odoo Web API docs)",
+    "description": "A PHP Client for Odoo",
     "keywords": ["RPC", "XML", "XMLRPC", "Odoo"],
     "homepage": "https://github.com/metadonors/odoo-rpc-client",
     "license": "MIT",
